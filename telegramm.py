@@ -4,7 +4,7 @@ import sqlite3
 import secrets
 
 # Ваш токен, который вы получили от BotFather
-TOKEN = '6898197210:AAFMFGS7W9-yWSqYj14enTTswoWZRkSvjz8'
+TOKEN = 'token'
 bot = telebot.TeleBot(TOKEN)
 
 conn = sqlite3.connect('bot_id.db')
