@@ -4,7 +4,7 @@ import sqlite3
 import secrets
 
 # Ваш токен, который вы получили от BotFather
-TOKEN = 'token'
+TOKEN = '6898197210:AAFMFGS7W9-yWSqYj14enTTswoWZRkSvjz8'
 bot = telebot.TeleBot(TOKEN)
 
 conn = sqlite3.connect('bot_id.db')
@@ -40,8 +40,13 @@ def db_action(query, params):
 @bot.message_handler(commands=['help'])
 def help(message):
     chat_id = message.chat.id
-    bot.send_message(chat_id,"доступные функции \n /start старт \n /help помощь \n /start_chat начать перписывать \n /prefernces добавить предпочтение в базу \n /settings настройки \n /create_id создание id бота обезательный этап для перписок")
+    bot.send_message(chat_id,"доступные функции \n /start старт \n /help помощь \n /start_chat начать перписывать \n /prefernces добавить предпочтение в базу \n /settings настройки \n /create_id создание id бота обезательный этап для перписок \n /internet")
 
+
+@bot.message_handler(commands=['internet'])
+def internet(message):
+    pass
+    #TODO
 
 @bot.message_handler(commands=['start'])
 def sigma(message):
@@ -146,4 +151,5 @@ def create_id(message):
         db_action(f"INSERT INTO users (id, bot_id1, bot_id2, bot_id3) VALUES (?, ?, ?, ?)",
                   (message.chat.id, *list_of_ids))
         bot.send_message(chat_id, "отправленно успешно")
+
 bot.infinity_polling()
