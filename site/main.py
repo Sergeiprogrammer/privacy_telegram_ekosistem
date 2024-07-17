@@ -1,12 +1,33 @@
+from flask import Flask, Blueprint , render_template_string
 import os
-import time
-from flask import Flask, render_template_string
 
 app = Flask(__name__)
 
+path = "D:\\windos_custom\\messenger\\storage\\sites_storage"
+
+# Получаем список всех сайтов (папок)
+sites = [f.name for f in os.scandir(path) if f.is_dir()]
+
+# Создание маршрутов для каждого сайта
+for site in sites:
+    blueprint = Blueprint(site, __name__, url_prefix=f'/{site}')
+    # Read file content outside the function to capture the current file content
+    index_file_path = f"{path}\\{site}\\templates\\index.html"
+    with open(index_file_path, 'r', encoding='utf-8') as file:
+        file_content = file.read()
+
+    def make_home(file_content):
+        def home():
+            return render_template_string(file_content)
+        return home
+
+    blueprint.route('/')(make_home(file_content))
+
+    # Registering the Blueprint in the application
+    app.register_blueprint(blueprint)
+
 @app.route('/')
-def home():
-    path = "D:\\windos_custom\\messenger\\storage\\sites_storage"
+def home1():
     items = os.listdir(path)
     my_dict = {}
     for item in items:
@@ -22,7 +43,7 @@ def home():
     value = ""
     for i, (key, description) in enumerate(my_dict.items()):
         if i < int(first_line):
-            value += "<div><strong>{}</strong><br>{}</div>\n".format(key, description)
+            value += f"<div onclick=\"location.href='/{key}'\"><strong>{key}</strong><br>{description}</div>\n"
 
     html_content = """
     <!DOCTYPE html>
@@ -74,6 +95,7 @@ def home():
                 font-size: 1.2em;
                 text-align: center;
                 padding: 10px;
+                cursor: pointer;
             }
             .footer {
                 padding: 1em 0;
