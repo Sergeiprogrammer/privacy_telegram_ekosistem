@@ -4,7 +4,7 @@ import time
 
 def virus_check(user_id):
     file_path = f"D:\\windos_custom\\messenger\\storage\\sites_storage\\user_files\\{user_id}.zip"
-    api_key = "22a80fb751cd42270ac45c50a8b5da3e24587f50ee1698fc6fa0adc8f6e3221e"
+    api_key = "your api token"
 
     url_scan = "https://www.virustotal.com/api/v3/files"
     headers = {
