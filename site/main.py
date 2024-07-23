@@ -37,8 +37,8 @@ def home1():
                 contents = file.read().strip()
                 my_dict[item] = contents
 
-    with open("D:\\windos_custom\\messenger\\storage\\sites-number.txt", 'r') as file:
-        first_line = file.readline().strip()
+    with open("D:\\windos_custom\\messenger\\storage\\site-number.txt","r") as file:
+        first_line = file.read().strip()
 
     value = ""
     for i, (key, description) in enumerate(my_dict.items()):

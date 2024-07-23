@@ -2,10 +2,15 @@ import telebot
 from telebot import types
 import sqlite3
 import secrets
+from virus_check import virus_check
+import json
+import asyncio
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 
+file_path = "D:\\windos_custom\\messenger\\"
+
 # Ваш токен, который вы получили от BotFather
-TOKEN = 'token'
+TOKEN = '6898197210:AAFMFGS7W9-yWSqYj14enTTswoWZRkSvjz8'
 bot = telebot.TeleBot(TOKEN)
 
 conn = sqlite3.connect('bot_id.db')
@@ -41,7 +46,7 @@ def db_action(query, params):
 @bot.message_handler(commands=['help'])
 def help(message):
     chat_id = message.chat.id
-    bot.send_message(chat_id,"доступные функции \n /start старт \n /help помощь \n /start_chat начать перписывать \n /prefernces добавить предпочтение в базу \n /settings настройки \n /create_id создание id бота обезательный этап для перписок \n /internet")
+    bot.send_message(chat_id,"доступные функции \n /start старт \n /help помощь \n /start_chat начать перписывать \n /prefernces добавить предпочтение в базу \n /settings настройки \n /create_id создание id бота обезательный этап для перписок \n /internet интренет , /add_site добавить новый сайт")
 
 
 @bot.message_handler(commands=['internet'])
@@ -64,25 +69,28 @@ def callback_help(callback):
     if callback.data == "help":
         help(callback.message)
 
-
 @bot.message_handler(commands=["start_chat"])
 def start_chat_0(message):
     chat_id = message.chat.id
-    bot.send_message(chat_id, "с какого id отправляем сообщения?")
     result = db_action("SELECT bot_id1, bot_id2, bot_id3 FROM users WHERE id =?", (chat_id,))
     if result:
-        bot.send_message(chat_id, f"  \n 1 {result[0][0]} \n 2 {result[0][1]} \n 3 {result[0][2]} введиет номер")
+        markup = types.ReplyKeyboardMarkup()
+        btn1 = types.KeyboardButton(result[0][0])
+        btn2 = types.KeyboardButton(result[0][1])
+        btn3 = types.KeyboardButton(result[0][2])
+        markup.add(btn1,btn2,btn3)
+        bot.send_message(chat_id, "введите номер id с которого будет сообщение" , reply_markup=markup)
         bot.register_next_step_handler(message, lambda msg: start_chat_1(msg, result))
     else:
         bot.send_message(chat_id, "у вас нет id создайте с помощью /create_id")
 
 def start_chat_1(message, result1):
     chat_id = message.chat.id
-    if int(message.text) > 3 or int(message.text) < 1 or len(message.text) > 1:
+    if len(message.text) != 16:
         bot.send_message(chat_id,"ошибка id нету")
     else:
         def start_chat_2_wrapper(msg):
-            start_chat_2(msg, chat_id, result1[int(message.text)-1])
+            start_chat_2(msg, chat_id, message.text)
         bot.register_next_step_handler(message, start_chat_2_wrapper)
         bot.send_message(chat_id, "введите id вашего собеседника или выберите из истории")
 
@@ -108,9 +116,6 @@ def start_chat_3(message, chat_id, result, result1):
     name = result[0]
     bot.send_message(name, message.text + f" \n отправленно от: {result1}")
     bot.send_message(chat_id, "всё отлично! если хотите продолжить введите новое сообщение иначе введите /cancel")
-    print(chat_id)
-    print(name)
-    print(result1)
     def start_chat_3_wrapper(msg):
         start_chat_3(msg, chat_id, (name,), result1)
     bot.register_next_step_handler(message, start_chat_3_wrapper)
@@ -156,4 +161,30 @@ def create_id(message):
                   (message.chat.id, *list_of_ids))
         bot.send_message(chat_id, "отправленно успешно")
 
+@bot.message_handler(commands=['add_site'])
+def add_site(message):
+    chat_id = message.chat.id
+    bot.send_message(chat_id, "пришлите файлы в zip архиве структурированые по принцыпу из примера")
+    bot.register_next_step_handler(message,virus_check1)
+
+
+def virus_check1(message):
+    if message.document.file_size >= 10485760:
+        bot.send_message(message.chat.id, "нельзя слишком большой файл!")
+    file_name = message.document.file_name
+    if file_name[-4:]!= ".zip":
+        bot.send_message(message.chat.id, "файл не zip!")
+    else:
+        file_info = bot.get_file(message.document.file_id)
+        downloaded_file = bot.download_file(file_info.file_path)
+        print(file_info)
+        print(file_name)
+        with open(file_path+f"storage\\sites_storage\\user_files\\{message.chat.id}.zip", 'wb') as new_file:
+            new_file.write(downloaded_file)
+        status = virus_check(message.chat_id)
+        if status != True:
+            print(status)
+        else:
+            bot.send_message(message.chat_id,"всё хорошо сайт будет опубликован")
+            #TODO сделай беарихвацию zip архива
 bot.infinity_polling()
