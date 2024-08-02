@@ -102,6 +102,7 @@ def help(message):
     chat_id = message.chat.id
     first = db_action("SELECT * FROM users WHERE id = ? ", (chat_id,), "ban_list.db")
     if len(first) == 0:
+        bot.send_message(chat_id,"в случаии если вы не нашли овтета на ваш вопрос вот ресурс который вам поможет https://github.com/Sergeiprogrammer/privacy_telegram_ekosistem посмотрете readme файл")
         list1 = ["/start", "/help", "/start_chat", "/settings", "/create_id", "/internet", "/add_site","/developers","/change_id"]
         bot.send_message(chat_id,f"доступные функции \n {list1[0]} старт \n {list1[1]} помощь \n {list1[2]} начать перписывать \n {list1[3]} настройки (рекомндуем ознакомисться!) \n {list1[4]} создание id бота (обезательный этап для перписок) \n {list1[5]} выход в приватный интренет тг бота \n {list1[6]} добавить новый сайт \n {list1[7]} для разработчиков , \n {list1[8]} позволяет сменить свой id и мия пользователя! , ЕСЛИ ХОТИТЕ ПРИНУДИТЕЛЬНО ЗАВЕРШИТЬ ДЕЙСТВИЕ ИСПОЛЬЗУЙТЕ /cancel")
         markup = types.ReplyKeyboardMarkup()
