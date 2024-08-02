@@ -14,7 +14,7 @@ import re
 file_path = "D:\\windos_custom\\messenger\\"
 
 # Ваш токен, который вы получили от BotFather
-TOKEN = '6898197210:AAFMFGS7W9-yWSqYj14enTTswoWZRkSvjz8'
+TOKEN = 'yourapi'
 bot = telebot.TeleBot(TOKEN)
 
 conn = sqlite3.connect('bot_id.db')
